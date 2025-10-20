@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json ./n
 
 RUN npm ci
 
@@ -14,4 +14,4 @@ ENV PORT 8080
 
 EXPOSE 8080
 
-CMD ["npm", "run", "start"]
+CMD ["shopify", "hydrogen", "preview"]
