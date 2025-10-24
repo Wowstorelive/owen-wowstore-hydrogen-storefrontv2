@@ -1,0 +1,40 @@
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "npx",
+      "args": [
+        "n8n-mcp"
+      ],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "https://n8n.wowstore.live",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4MzAyNzA4ZC1kMzE0LTQ5ZDktYTgwOC0wZTdhMjNmMzhkZTEiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzYxMDM2MjcwLCJleHAiOjE3Njg3OTg4MDB9.9THLBxfXkooAhWIlsGnoel0wD5y2o0wqq_4f09W88QE"
+      }
+    },
+    "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "@wonderwhy-er/desktop-commander@latest"
+      ]
+    },
+    "dockerhub": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "HUB_PAT_TOKEN",
+        "mcp/dockerhub",
+        "--transport=stdio",
+        "--username=wowstore4ive"
+      ],
+      "env": {
+        "HUB_PAT_TOKEN": "dckr_pat_vTN1sly7L1R8LVH2BDGwPs-WnEo"
+      }
+    }
+  },
+  "isUsingBuiltInNodeForMcp": true
+}
