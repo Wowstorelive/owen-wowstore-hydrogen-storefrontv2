@@ -17,8 +17,9 @@ import {
 import {AppSession} from '~/lib/session.server';
 import {getLocaleFromRequest} from '~/lib/utils';
 import {createAdminClient} from '~/lib/adminClient';
-import { createClient as createSanityClient } from '@sanity/client';
-import {createClient as createSupabaseClient} from '@supabase/supabase-js';
+import {Firestore} from '@google-cloud/firestore';
+import {Storage} from '@google-cloud/storage';
+import {Pool} from 'pg';
 import {CART_QUERY_FRAGMENT} from '~/data/fragments';
 
 /**
@@ -68,20 +69,31 @@ export default {
       });
 
       /**
-       * Create a client for Sanity API.
-      */
-      const sanity = createSanityClient({
-        cache,
-        projectId: env.SANITY_PROJECT_ID,
-        dataset: env.SANITY_DATASET,
-        apiVersion: env.SANITY_API_VERSION || '2023-03-30',
-        useCdn: process.env.NODE_ENV === 'production',
+       * Create Google Cloud clients (Firestore + Storage)
+       */
+      const firestore = new Firestore({
+        projectId: env.GCP_PROJECT_ID,
+        // Uses Application Default Credentials from GKE environment
+      });
+
+      const gcs = new Storage({
+        projectId: env.GCP_PROJECT_ID,
+        // Uses Application Default Credentials from GKE environment
       });
 
       /**
-       * Create a client for Supabase API.
+       * Create PostgreSQL connection pool
        */
-      const supabase = createSupabaseClient(env.SUPABASE_URL, env.SUPABASE_API_KEY);
+      const postgres = new Pool({
+        host: env.POSTGRES_HOST,
+        port: parseInt(env.POSTGRES_PORT || '5432'),
+        database: env.POSTGRES_DATABASE,
+        user: env.POSTGRES_USER,
+        password: env.POSTGRES_PASSWORD,
+        max: 20, // Maximum pool size
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      });
 
       /**
        * Create a client for Customer Account API.
@@ -115,8 +127,9 @@ export default {
           customerAccount,
           cart,
           admin,
-          sanity,
-          supabase,
+          firestore,
+          gcs,
+          postgres,
           env,
           waitUntil,
         }),

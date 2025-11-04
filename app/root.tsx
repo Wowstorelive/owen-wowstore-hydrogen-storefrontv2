@@ -24,7 +24,6 @@ import {
   type SeoConfig,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
-import groq from 'groq';
 import {toast, Toaster, ToastBar} from 'react-hot-toast';
 import {useChangeLanguage} from 'remix-i18next';
 import {useTranslation} from 'react-i18next';
@@ -38,10 +37,8 @@ import {LayoutDefault as PageLayout} from '~/components/layouts/default/Layout';
 // import {LayoutSpring as PageLayout} from '~/components/layouts/spring/Layout';
 // import {LayoutSummer as PageLayout} from '~/components/layouts/summer/Layout';
 // import {LayoutWinter as PageLayout} from '~/components/layouts/winter/Layout';
-import {SANITY_SETTINGS} from '~/data/sanity/settings';
-import {MAIN_MENU} from '~/data/sanity/menu';
-import {COLOR_THEME} from '~/data/sanity/colorTheme';
 import {ColorTheme} from '~/components/ColorTheme';
+import {getCmsSettings, getCmsMenus, getCmsColorTheme} from '~/lib/firestore-content';
 import favicon from '~/assets/favicon.svg';
 import {GenericError} from '~/components/GenericError';
 import {NotFound} from '~/components/NotFound';
@@ -106,23 +103,25 @@ export async function loader(args: LoaderFunctionArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({request, context}: LoaderFunctionArgs) {
-  const {storefront, env} = context;
+  const {storefront, env, firestore} = context;
 
   const lang = storefront.i18n.language.toLowerCase();
   let currencyCode = context.storefront.i18n.currency || 'USD';
 
-  const sanityQuery = groq`
-    {
-      'settings': *[_type == "settings" && language == "${lang}"] {${SANITY_SETTINGS}},
-      'menu': *[_type == "menu" && language == "${lang}"] {${MAIN_MENU}} | order(position),
-      'colorTheme': *[_type == "colorTheme"] {${COLOR_THEME}}
-    }
-  `;
-
-  const [layout, sanityData] = await Promise.all([
+  // Fetch CMS data from Firestore instead of Sanity
+  const [layout, settings, menu, colorTheme] = await Promise.all([
     getLayoutData(context),
-    context.sanity.fetch(sanityQuery),
+    getCmsSettings(firestore, lang),
+    getCmsMenus(firestore, lang),
+    getCmsColorTheme(firestore),
   ]);
+
+  // Format data to match expected structure
+  const sanityData = {
+    settings: settings ? [settings] : [],
+    menu: menu || [],
+    colorTheme: colorTheme ? [colorTheme] : [],
+  };
 
   const seo = seoPayload.root({shop: layout.shop, url: request.url});
 

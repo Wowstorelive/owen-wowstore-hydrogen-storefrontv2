@@ -9,7 +9,9 @@ import type {
 } from '@shopify/hydrogen';
 import type {Storefront, CustomerAccount} from '~/lib/type';
 import type {AppSession} from '~/lib/session.server';
-import type {Sanity} from 'hydrogen-sanity';
+import type {Firestore} from '@google-cloud/firestore';
+import type {Storage} from '@google-cloud/storage';
+import type {Pool} from 'pg';
 
 declare global {
   /**
@@ -31,15 +33,20 @@ declare global {
     PUBLIC_CHECKOUT_DOMAIN: string;
     PRIVATE_ADMIN_API_TOKEN: string;
     PRIVATE_ADMIN_API_VERSION: string;
-    SANITY_PROJECT_ID: string;
-    SANITY_DATASET: string;
-    SANITY_API_VERSION: string;
     SENDGRID_API_KEY: string;
-    SUPABASE_URL: string;
-    SUPABASE_API_KEY: string;
-    SUPABASE_PREFIX_BUCKET: string;
-    SUPABASE_BUCKET_IMAGE_REVIEW: string;
-    SUPABASE_BUCKET_RETURNS: string;
+    GCP_PROJECT_ID: string;
+    GCS_BUCKET_REVIEW_IMAGES: string;
+    GCS_BUCKET_RETURN_IMAGES: string;
+    POSTGRES_HOST: string;
+    POSTGRES_PORT: string;
+    POSTGRES_DATABASE: string;
+    POSTGRES_USER: string;
+    POSTGRES_PASSWORD: string;
+    N8N_WEBHOOK_RETURNS?: string;
+    N8N_WEBHOOK_REVIEW_SUBMITTED?: string;
+    N8N_WEBHOOK_RETURN_CREATED?: string;
+    N8N_WEBHOOK_CONTENT_REQUESTED?: string;
+    N8N_WEBHOOK_FUNNEL_EVENT?: string;
   }
 }
 
@@ -53,8 +60,10 @@ declare module '@shopify/remix-oxygen' {
     storefront: Storefront;
     customerAccount: CustomerAccount;
     admin: AdminClient;
-    sanity: Sanity;
     cart: HydrogenCart;
+    firestore: Firestore;
+    gcs: Storage;
+    postgres: Pool;
     env: Env;
   }
 

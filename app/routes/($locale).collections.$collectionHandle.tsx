@@ -18,7 +18,6 @@ import {
   getSeoMeta,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
-import groq from 'groq';
 import {useTranslation} from 'react-i18next';
 
 import i18next from '~/i18next.server';
@@ -33,8 +32,8 @@ import {ProductCard} from '~/components/cards/ProductCard';
 import {PAGINATION_SIZE} from '~/lib/const';
 import {routeHeaders} from '~/data/cache';
 import {seoPayload} from '~/lib/seo.server';
-import {COLLECTION} from '~/data/sanity/collection';
 import type {CollectionDetailsQuery} from 'storefrontapi.generated';
+import {getCmsCollection} from '~/lib/firestore-content';
 import type {SortParam} from '~/components/elements/SortFilter';
 import {ModuleSection} from '~/components/ModuleSection';
 import { useFilter } from '~/hooks/useFilter';
@@ -87,12 +86,12 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
 
   const seo = seoPayload.collection({collection, url: request.url});
 
-  const sanityQuery = groq`
-    *[_type == "collection" && store.slug.current == "${params.collectionHandle}"][0] {
-      ${COLLECTION}
-    }
-  `;
-  const collectionSanity = await context.sanity.fetch(sanityQuery);
+  // Fetch collection content from Firestore instead of Sanity
+  const collectionSanity = await getCmsCollection(
+    context.firestore,
+    collectionHandle,
+    lang,
+  );
 
   return json({
     collection,

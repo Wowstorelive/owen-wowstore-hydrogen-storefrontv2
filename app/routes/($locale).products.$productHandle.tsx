@@ -157,7 +157,18 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
     url: request.url,
   });
 
-  const {data: reviewProduct} = await context.supabase.from('product_review').select().eq('productHandle', productHandle);
+  // Fetch reviews from Firestore
+  const reviewsSnapshot = await context.firestore
+    .collection('product_reviews')
+    .where('productHandle', '==', productHandle)
+    .orderBy('createdAt', 'desc')
+    .get();
+
+  const reviewProduct = reviewsSnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate().toISOString(),
+  }));
   
   return defer({
     variants,

@@ -6,13 +6,12 @@ import {
 import {useLoaderData} from '@remix-run/react';
 import invariant from 'tiny-invariant';
 import {Suspense} from 'react';
-import groq from 'groq';
 import {getSeoMeta} from '@shopify/hydrogen';
 import {PageHeader} from '~/components/elements/Text';
 import {routeHeaders} from '~/data/cache';
 import {seoPayload} from '~/lib/seo.server';
-import {PAGE} from '~/data/sanity/pages/page';
 import {ModuleSection} from '~/components/ModuleSection';
+import {getCmsPage} from '~/lib/firestore-content';
 
 export const headers = routeHeaders;
 
@@ -23,16 +22,11 @@ export async function loader(args: LoaderFunctionArgs) {
 
 async function loadCriticalData({context, params, request}: LoaderFunctionArgs) {
   invariant(params.pageHandle, 'Missing page handle');
+  const {firestore} = context;
   const lang = context.storefront.i18n.language.toLowerCase();
-  const query = groq`
-    *[_type == "page" && language == "${lang}" && slug == "${params.pageHandle}"][0] {
-      ${PAGE}
-    }
-  `;
 
-  const [page] = await Promise.all([
-    context.sanity.fetch(query),
-  ]);
+  // Fetch page content from Firestore instead of Sanity
+  const page = await getCmsPage(firestore, params.pageHandle, lang);
 
   if (!page) {
     throw new Response(null, {status: 404});

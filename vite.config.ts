@@ -20,6 +20,12 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   ssr: {
+    external: [
+      '@google-cloud/firestore',
+      '@google-cloud/storage',
+      'pg',
+      'pg-native',
+    ],
     optimizeDeps: {
       include: [
         'geolib',
@@ -28,8 +34,6 @@ export default defineConfig({
         'accept-language-parser',
         'fast-deep-equal',
         'fast-deep-equal/react',
-        '@supabase/postgrest-js',
-        '@supabase/supabase-js',
       ],
     },
   },

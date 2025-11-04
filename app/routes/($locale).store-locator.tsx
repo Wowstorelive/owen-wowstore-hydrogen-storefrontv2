@@ -1,5 +1,4 @@
 import {useState, useEffect, useCallback, useMemo} from 'react';
-import groq from 'groq';
 import {json, type MetaArgs, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {getSeoMeta} from '@shopify/hydrogen';
 import {useLoaderData} from '@remix-run/react';
@@ -23,10 +22,8 @@ import {
 } from '~/components/elements/Icon';
 
 import {seoPayload} from '~/lib/seo.server';
-import {
-  STORE_LOCATOR,
-  STORE_LOCATOR_SEARCH_BY_NAME,
-} from '~/data/sanity/pages/storeLocator';
+import {getCmsPage} from '~/lib/firestore-content';
+import {getStoreLocations} from '~/lib/firestore-content';
 import { useTranslation } from 'react-i18next';
 
 const dataSelected = [
@@ -45,27 +42,39 @@ const dataSelected = [
 ];
 
 export async function loader({request, context}: LoaderFunctionArgs) {
-  const sanityClient = context.sanity.client;
-  const query = groq`
-      *[slug == 'store-locator'][0]{
-        ${STORE_LOCATOR}
-      }
-    `;
+  const {firestore, postgres} = context;
+  const lang = context.storefront.i18n.language.toLowerCase();
 
-  const page = await sanityClient.fetch(query);
+  // Fetch page content from Firestore and store locations from PostgreSQL
+  const [page, stores] = await Promise.all([
+    getCmsPage(firestore, 'store-locator', lang),
+    getStoreLocations(postgres),
+  ]);
+
   if (!page) {
     throw new Response(null, {status: 404});
   }
-  
+
+  // Transform PostgreSQL store data to match expected format
+  const formattedStores = stores.map((store: any) => ({
+    _key: store.id,
+    storeName: store.name,
+    storeAddress: store.address,
+    storeEmail: store.email,
+    phoneNumber: store.phone,
+    website: store.website,
+    latitude: store.lat.toString(),
+    longitude: store.lng.toString(),
+    storeImage: store.images?.[0] ? {image: {url: store.images[0]}} : null,
+  }));
+
   const seo = seoPayload.page({page, url: request.url});
-  const stores = page?.modules?.length > 0 ? page?.modules[0]?.stores : null;
 
   return json({
     page,
     dataSelected,
     seo,
-    sanityClient,
-    stores,
+    stores: formattedStores,
   });
 }
 
@@ -74,7 +83,7 @@ export const meta = ({matches}: MetaArgs<typeof loader>) => {
 };
 
 export default function StoreLocator() {
-  const {page, sanityClient, stores} = useLoaderData<typeof loader>();
+  const {page, stores} = useLoaderData<typeof loader>();
 
   const {t} = useTranslation();
   const [currentLocator, setCurrentLocator] = useState<any>();
@@ -103,15 +112,15 @@ export default function StoreLocator() {
 
   const searchTerm = async (e: any) => {
     e.preventDefault();
-    const query = groq`
-      *[_type == 'storeLocator'][0]{
-        ${STORE_LOCATOR_SEARCH_BY_NAME(valueSearch)}
-      }
-    `;
+
     if (selectedOptionSearch == 'store-name') {
-      const dataSearchStoreLocator = await sanityClient?.fetch(query);
-      if (dataSearchStoreLocator.stores.length > 0) {
-        setDataSearch(dataSearchStoreLocator.stores);
+      // Filter stores by name (client-side)
+      const filteredStores = stores.filter((store: any) =>
+        store.storeName.toLowerCase().includes(valueSearch.toLowerCase())
+      );
+
+      if (filteredStores.length > 0) {
+        setDataSearch(filteredStores);
       } else {
         setDataSearch(null);
         setErrorMessage(t('There are no store'));

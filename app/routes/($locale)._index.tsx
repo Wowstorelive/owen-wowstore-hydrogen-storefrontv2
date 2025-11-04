@@ -4,13 +4,12 @@ import {
   type LoaderFunctionArgs,
 } from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
-import groq from 'groq';
 import {Suspense} from 'react';
 import {getSeoMeta} from '@shopify/hydrogen';
-import {HOME_PAGE} from '~/data/sanity/pages/home';
 import {seoPayload} from '~/lib/seo.server';
 import {routeHeaders} from '~/data/cache';
 import {ModuleSection} from '~/components/ModuleSection';
+import {getCmsHome} from '~/lib/firestore-content';
 
 export const headers = routeHeaders;
 
@@ -34,17 +33,11 @@ export async function loader(args: LoaderFunctionArgs) {
 
 async function loadCriticalData({context}: LoaderFunctionArgs) {
   const {language} = context.storefront.i18n;
+  const {firestore} = context;
   const lang = language.toLowerCase();
 
-  const query = groq`
-      *[_type == 'home' && language == "${lang}"][0]{
-        ${HOME_PAGE}
-      }
-    `;
-
-  const [homeData] = await Promise.all([
-    context.sanity.fetch(query),
-  ]);
+  // Fetch home content from Firestore instead of Sanity
+  const homeData = await getCmsHome(firestore, lang);
 
   return {
     homeData,
