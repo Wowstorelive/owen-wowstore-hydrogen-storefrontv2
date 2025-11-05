@@ -5,7 +5,7 @@
  */
 
 import {json, type ActionFunctionArgs} from '@shopify/remix-oxygen';
-import {createVoiceSession} from '~/lib/voice-ai/voice-session.service';
+import {createVoiceSession} from '~/lib/voice-ai/voice-session.service.server';
 import {triggerWebhook} from '~/lib/webhooks';
 
 export async function action({request, context}: ActionFunctionArgs) {

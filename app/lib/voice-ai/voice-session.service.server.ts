@@ -3,17 +3,11 @@
  * Manages voice conversation sessions with Firestore persistence
  */
 
-import {getFirestore} from 'firebase-admin/firestore';
-import type {ConversationMessage, AssistantContext} from './vertex-assistant.service';
+import {getFirestore} from '../firebase.server';
+import type {ConversationMessage, AssistantContext} from './vertex-assistant.service.server';
 
-// Initialize Firestore (using existing connection from firestore-content.ts)
-let db: FirebaseFirestore.Firestore | null = null;
-
-function getDb(): FirebaseFirestore.Firestore {
-  if (!db) {
-    db = getFirestore();
-  }
-  return db;
+function getDb() {
+  return getFirestore();
 }
 
 export interface VoiceSession {

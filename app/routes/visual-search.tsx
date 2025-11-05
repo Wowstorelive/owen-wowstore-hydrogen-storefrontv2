@@ -5,7 +5,7 @@ import {
   visualSearch,
   getSpaceDesignAdvice,
   type VisualSearchResult,
-} from '~/lib/visual-intelligence.service';
+} from '~/lib/visual-intelligence.service.server';
 
 export async function loader({context}: LoaderFunctionArgs) {
   let customerId;

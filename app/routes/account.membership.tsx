@@ -3,11 +3,10 @@ import {useLoaderData, Form} from '@remix-run/react';
 import {
   getMembershipTier,
   getMembershipStats,
-  MEMBERSHIP_TIERS,
   addToFoundingMemberWaitlist,
-  type MembershipTier,
-} from '~/lib/membership.service';
-import {getUserStory, getCommunityImpactStats} from '~/lib/social-integration.service';
+} from '~/lib/membership.service.server';
+import {MEMBERSHIP_TIERS, type MembershipTier} from '~/lib/membership.types';
+import {getUserStory, getCommunityImpactStats} from '~/lib/social-integration.service.server';
 
 export async function loader({context}: LoaderFunctionArgs) {
   // Check if user is logged in

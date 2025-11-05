@@ -23,6 +23,12 @@ export default defineConfig({
     external: [
       '@google-cloud/firestore',
       '@google-cloud/storage',
+      '@google-cloud/speech',
+      '@google-cloud/text-to-speech',
+      '@google-cloud/vertexai',
+      '@google-cloud/vision',
+      'firebase-admin',
+      'qrcode',
       'pg',
       'pg-native',
     ],

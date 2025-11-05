@@ -5,7 +5,7 @@
  */
 
 import {json, type ActionFunctionArgs} from '@shopify/remix-oxygen';
-import {trackConversionAttempt} from '~/lib/voice-ai/voice-session.service';
+import {trackConversionAttempt} from '~/lib/voice-ai/voice-session.service.server';
 
 export async function action({request, context}: ActionFunctionArgs) {
   if (request.method !== 'POST') {

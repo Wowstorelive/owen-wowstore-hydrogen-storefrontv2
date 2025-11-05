@@ -8,8 +8,8 @@ import {json, type ActionFunctionArgs} from '@shopify/remix-oxygen';
 import {
   endVoiceSession,
   getVoiceSession,
-} from '~/lib/voice-ai/voice-session.service';
-import {summarizeConversation} from '~/lib/voice-ai/vertex-assistant.service';
+} from '~/lib/voice-ai/voice-session.service.server';
+import {summarizeConversation} from '~/lib/voice-ai/vertex-assistant.service.server';
 import {triggerWebhook} from '~/lib/webhooks';
 
 export async function action({request}: ActionFunctionArgs) {

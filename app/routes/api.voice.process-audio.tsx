@@ -5,15 +5,15 @@
  */
 
 import {json, type ActionFunctionArgs} from '@shopify/remix-oxygen';
-import {transcribeAudio} from '~/lib/voice-ai/speech-to-text.service';
-import {generateAssistantResponse} from '~/lib/voice-ai/vertex-assistant.service';
+import {transcribeAudio} from '~/lib/voice-ai/speech-to-text.service.server';
+import {generateAssistantResponse} from '~/lib/voice-ai/vertex-assistant.service.server';
 import {
   getVoiceSession,
   addMessageToSession,
   updateSessionContext,
   trackProductDiscussion,
   trackConversionAttempt,
-} from '~/lib/voice-ai/voice-session.service';
+} from '~/lib/voice-ai/voice-session.service.server';
 import {triggerWebhook} from '~/lib/webhooks';
 
 export async function action({request, context}: ActionFunctionArgs) {

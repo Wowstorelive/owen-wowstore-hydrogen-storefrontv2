@@ -11,6 +11,8 @@
 import {getVertexAI} from './vertex-ai.server';
 import {getFirestore} from './firebase.server';
 import {Storage} from '@google-cloud/storage';
+import {createWowMoment, generateQRCode} from './qr-share-rewards.service.server';
+import {getUserStory} from './social-integration.service.server';
 
 const storage = new Storage();
 
@@ -698,7 +700,3 @@ async function generateMultiProductVisualization(
   // TODO: Composite multiple products onto user photo
   return `${userPhotoUrl}?products=${productIds.join(',')}`;
 }
-
-// Import required functions from other services
-import {createWowMoment, generateQRCode, awardSharePoints} from './qr-share-rewards.service';
-import {getUserStory} from './social-integration.service';

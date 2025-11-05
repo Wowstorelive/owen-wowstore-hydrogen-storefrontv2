@@ -6,7 +6,7 @@ import {
   getUserVirtueImpact,
 } from '~/lib/virtue-impact.service.server';
 import {VIRTUE_CAUSES, type VirtueCause} from '~/lib/virtue-impact.types';
-import {generateQRCode, createWowMoment} from '~/lib/qr-share-rewards.service';
+import {generateQRCode, createWowMoment} from '~/lib/qr-share-rewards.service.server';
 
 export async function loader({context}: LoaderFunctionArgs) {
   // Require authentication
