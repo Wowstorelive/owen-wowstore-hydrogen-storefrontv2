@@ -68,6 +68,7 @@ import type {
   SellingPlanFragment,
 } from 'storefrontapi.generated';
 import {ValidateEmail} from '~/lib/utils';
+import {ProductVoiceAssistant} from '~/components/voice/ProductVoiceAssistant';
 
 export const headers = routeHeaders;
 
@@ -365,6 +366,16 @@ export default function Product() {
               quantity: 1,
             },
           ],
+        }}
+      />
+
+      {/* Voice Shopping Assistant - Accessible for all users (login required) */}
+      <ProductVoiceAssistant
+        product={product}
+        customer={customer}
+        liveShoppingContext={{
+          isLive: false, // Set to true during live shopping events
+          // platform: 'youtube', // Set during live events
         }}
       />
     </>
